@@ -1,9 +1,15 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import TextField from "@material-ui/core/TextField";
-import { FormInputProps } from "./FormInputProps";
 
-export const FormInputText = ({ name, control, label }: FormInputProps) => {
+interface FormInputProps {
+  name: string;
+  label: string;
+  type?: string;
+}
+
+export const FormInputText = ({ name, label, type }: FormInputProps) => {
+  const { control } = useFormContext();
   return (
     <Controller
       name={name}
@@ -22,6 +28,7 @@ export const FormInputText = ({ name, control, label }: FormInputProps) => {
           fullWidth
           label={label}
           variant="outlined"
+          type={type ? type : "text"}
         />
       )}
     />

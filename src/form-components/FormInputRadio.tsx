@@ -5,52 +5,52 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  FormHelperText,
 } from "@material-ui/core";
-import { Controller } from "react-hook-form";
-import { FormInputProps } from "./FormInputProps";
+import { Controller, useFormContext } from "react-hook-form";
 
-const options = [
-  {
-    label: "Radio Option 1",
-    value: "1",
-  },
-  {
-    label: "Radio Option 2",
-    value: "2",
-  },
-];
+interface option {
+  label: string;
+  value: string | number;
+}
+
+interface FormInputProps {
+  name: string;
+  label: string;
+  options: option[];
+}
 
 export const FormInputRadio: React.FC<FormInputProps> = ({
   name,
-  control,
   label,
+  options,
 }) => {
-  const generateRadioOptions = () => {
-    return options.map((singleOption) => (
-      <FormControlLabel
-        value={singleOption.value}
-        label={singleOption.label}
-        control={<Radio />}
-      />
-    ));
-  };
-
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
   return (
-    <FormControl component="fieldset">
+    <FormControl component="fieldset" error={errors && !!errors[name]}>
       <FormLabel component="legend">{label}</FormLabel>
       <Controller
         name={name}
         control={control}
-        render={({
-          field: { onChange, value },
-          fieldState: { error },
-          formState,
-        }) => (
+        render={({ field: { onChange, value } }) => (
           <RadioGroup value={value} onChange={onChange}>
-            {generateRadioOptions()}
+            {options.map((option) => {
+              return (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  label={option.label}
+                  control={<Radio />}
+                />
+              );
+            })}
           </RadioGroup>
         )}
       />
+      <FormHelperText>{errors ? errors[name]?.message : ""}</FormHelperText>
     </FormControl>
   );
 };

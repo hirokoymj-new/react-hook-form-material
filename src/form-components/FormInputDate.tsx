@@ -5,10 +5,15 @@ import {
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import { Controller, useFormContext } from "react-hook-form";
-import { FormInputProps } from "./FormInputProps";
 const DATE_FORMAT = "dd-MMM-yy";
 
-export const FormInputDate = ({ name, control, label }: FormInputProps) => {
+interface FormInputProps {
+  name: string;
+  label: string;
+}
+
+export const FormInputDate = ({ name, label }: FormInputProps) => {
+  const { control } = useFormContext();
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Controller

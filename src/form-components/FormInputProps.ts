@@ -1,6 +1,11 @@
+interface option {
+  label: string;
+  value: string | number;
+}
+
 export interface FormInputProps {
   name: string;
-  control: any;
   label: string;
-  setValue?: any;
+  options?: option[];
+  // control?: any;
 }

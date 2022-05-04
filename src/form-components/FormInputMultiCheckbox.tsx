@@ -4,63 +4,103 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  FormGroup,
+  FormHelperText,
 } from "@material-ui/core";
-import { Controller } from "react-hook-form";
-import { FormInputProps } from "./FormInputProps";
+import { Controller, useFormContext } from "react-hook-form";
 
-const options = [
-  {
-    label: "Checkbox Option 1",
-    value: "1",
-  },
-  {
-    label: "Checkbox Option 2",
-    value: "2",
-  },
-];
+interface option {
+  label: string;
+  value: string | number;
+}
+
+interface FormInputProps {
+  name: string;
+  label: string;
+  options: option[];
+  defaultValues: any[];
+}
 
 export const FormInputMultiCheckbox: React.FC<FormInputProps> = ({
   name,
-  control,
-  setValue,
   label,
+  options,
+  defaultValues,
 }) => {
-  const [selectedItems, setSelectedItems] = useState<any>([]);
+  // const [selectedItems, setSelectedItems] = useState<any>([]);
+  const {
+    control,
+    formState: { errors, isSubmitSuccessful },
+    setValue,
+    getValues,
+  } = useFormContext();
+
+  // const handleSelect = (value: any) => {
+  //   const isPresent = selectedItems.indexOf(value);
+  //   if (isPresent !== -1) {
+  //     const remaining = selectedItems.filter((item: any) => item !== value);
+  //     setSelectedItems(remaining);
+  //   } else {
+  //     setSelectedItems((prevItems: any) => [...prevItems, value]);
+  //   }
+  // };
 
   const handleSelect = (value: any) => {
-    const isPresent = selectedItems.indexOf(value);
-    if (isPresent !== -1) {
-      const remaining = selectedItems.filter((item: any) => item !== value);
-      setSelectedItems(remaining);
-    } else {
-      setSelectedItems((prevItems: any) => [...prevItems, value]);
-    }
+    const values = getValues();
+    const selectedItems = values[name];
+    const newItems = selectedItems.includes(value)
+      ? selectedItems.filter((item: any) => item !== value)
+      : [...selectedItems, value];
+    // setSelectedItems(newItems);
+    return newItems;
   };
 
-  useEffect(() => {
-    setValue(name, selectedItems);
-  }, [selectedItems]);
+  // useEffect(() => {
+  //   setValue(name, selectedItems);
+  //   if (isSubmitSuccessful) {
+  //     setSelectedItems([]);
+  //   }
+  // }, [selectedItems, isSubmitSuccessful]);
+
+  // const handleCheck = (value: any) => {
+  //   console.log("handleCheck");
+  //   const values = getValues();
+  //   console.log(values[name]);
+
+  //   const newIds = values[name]?.includes(value)
+  //     ? values[name]?.filter((id: string) => id !== value)
+  //     : [...values[name], value];
+  //   console.log(newIds);
+  //   return newIds;
+  // };
 
   return (
-    <FormControl size={"small"} variant={"outlined"}>
+    <FormControl
+      size={"small"}
+      variant={"outlined"}
+      error={errors && errors[name]}>
       <FormLabel component="legend">{label}</FormLabel>
-
-      <div>
-        {options.map((option: any) => {
+      <FormGroup row>
+        {options.map((option) => {
           return (
             <FormControlLabel
               control={
                 <Controller
                   name={name}
-                  render={({}) => {
+                  render={({ field: { onChange } }) => {
+                    // console.log(getValues());
+                    const values = getValues();
+                    console.log(values[name]);
                     return (
                       <Checkbox
-                        checked={selectedItems.includes(option.value)}
-                        onChange={() => handleSelect(option.value)}
+                        onChange={() => onChange(handleSelect(option.value))}
+                        // checked={selectedItems.includes(option.value)}
+                        checked={values[name].includes(option.value)}
                       />
                     );
                   }}
                   control={control}
+                  defaultValue=""
                 />
               }
               label={option.label}
@@ -68,7 +108,8 @@ export const FormInputMultiCheckbox: React.FC<FormInputProps> = ({
             />
           );
         })}
-      </div>
+      </FormGroup>
+      <FormHelperText>{errors && errors[name]?.message}</FormHelperText>
     </FormControl>
   );
 };
